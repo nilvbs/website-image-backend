@@ -36,15 +36,21 @@ export default {
     }
 
     if (url.pathname === "/health" && request.method === "GET") {
-      return jsonResponse({
-        status: "ok",
-        configured: {
-          AWS_REGION: Boolean(env.AWS_REGION),
-          S3_BUCKET_NAME: Boolean(env.S3_BUCKET_NAME),
-          AWS_ACCESS_KEY_ID: Boolean(env.AWS_ACCESS_KEY_ID),
-          AWS_SECRET_ACCESS_KEY: Boolean(env.AWS_SECRET_ACCESS_KEY),
-        },
-      });
+      const configured = {
+        AWS_REGION: Boolean(env.AWS_REGION),
+        S3_BUCKET_NAME: Boolean(env.S3_BUCKET_NAME),
+        AWS_ACCESS_KEY_ID: Boolean(env.AWS_ACCESS_KEY_ID),
+        AWS_SECRET_ACCESS_KEY: Boolean(env.AWS_SECRET_ACCESS_KEY),
+      };
+
+      const response = { status: "ok", configured };
+
+      if (!configured.AWS_ACCESS_KEY_ID || !configured.AWS_SECRET_ACCESS_KEY) {
+        response.hint =
+          "Add AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY as Secrets (encrypted), not plain Variables. Plain Variables are removed on each wrangler deploy.";
+      }
+
+      return jsonResponse(response);
     }
 
     if (url.pathname === "/api/upload" && request.method === "POST") {

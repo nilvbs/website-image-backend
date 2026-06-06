@@ -3,6 +3,9 @@ main = "src/worker.js"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 
+# Non-sensitive config only. AWS credentials MUST be added as Secrets
+# in the Cloudflare dashboard (not as plain Variables), or wrangler deploy
+# will remove them on each deploy.
 [vars]
 AWS_REGION = "us-east-2"
 S3_BUCKET_NAME = "vbs-website-image"
