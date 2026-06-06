@@ -51,7 +51,22 @@ function mimeToExtension(mimetype) {
   return map[mimetype] || "";
 }
 
+function validateEnv(env) {
+  const required = [
+    "AWS_ACCESS_KEY_ID",
+    "AWS_SECRET_ACCESS_KEY",
+    "AWS_REGION",
+    "S3_BUCKET_NAME",
+  ];
+  const missing = required.filter((key) => !env[key]);
+  if (missing.length > 0) {
+    throw new Error(`Missing configuration: ${missing.join(", ")}`);
+  }
+}
+
 async function uploadImage(file, env) {
+  validateEnv(env);
+
   const s3Client = getS3Client(env);
   const bucket = env.S3_BUCKET_NAME;
   const key = buildObjectKey(file.originalname, file.mimetype);

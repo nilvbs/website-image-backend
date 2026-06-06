@@ -36,7 +36,15 @@ export default {
     }
 
     if (url.pathname === "/health" && request.method === "GET") {
-      return jsonResponse({ status: "ok" });
+      return jsonResponse({
+        status: "ok",
+        configured: {
+          AWS_REGION: Boolean(env.AWS_REGION),
+          S3_BUCKET_NAME: Boolean(env.S3_BUCKET_NAME),
+          AWS_ACCESS_KEY_ID: Boolean(env.AWS_ACCESS_KEY_ID),
+          AWS_SECRET_ACCESS_KEY: Boolean(env.AWS_SECRET_ACCESS_KEY),
+        },
+      });
     }
 
     if (url.pathname === "/api/upload" && request.method === "POST") {
@@ -84,6 +92,25 @@ export default {
         );
       } catch (err) {
         console.error("Upload failed:", err);
+
+        if (err.message?.startsWith("Missing configuration:")) {
+          return jsonResponse({ error: err.message }, 500);
+        }
+
+        if (err.name === "CredentialsProviderError" || err.message?.includes("credential")) {
+          return jsonResponse(
+            { error: "AWS credentials are invalid or not configured in Cloudflare secrets." },
+            500
+          );
+        }
+
+        if (err.name === "AccessDenied" || err.Code === "AccessDenied") {
+          return jsonResponse(
+            { error: "AWS access denied. Check IAM permissions for s3:PutObject on the bucket." },
+            500
+          );
+        }
+
         return jsonResponse({ error: "Failed to upload image" }, 500);
       }
     }
