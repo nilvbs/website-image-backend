@@ -6,13 +6,10 @@ import multer from "multer";
 import uploadRouter from "./routes/upload.js";
 
 const requiredEnv = [
-  "AWS_ACCESS_KEY_ID",
-  "AWS_SECRET_ACCESS_KEY",
-  "AWS_REGION",
-  "S3_BUCKET_NAME",
+  "S3_PUBLIC_URL_PREFIX",
 ];
 
-const missing = requiredEnv.filter((key) => !process.env[key]);
+const missing = requiredEnv.filter((key) => !config[key]);
 if (missing.length > 0) {
   console.error(`Missing required environment variables: ${missing.join(", ")}`);
   console.error("Copy .env.example to .env and fill in your AWS credentials.");

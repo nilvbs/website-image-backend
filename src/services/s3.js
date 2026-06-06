@@ -7,24 +7,24 @@ function getExtension(filename) {
   return filename.slice(lastDot).toLowerCase();
 }
 
-function getS3Client(env) {
+function getS3Client(config) {
   return new S3Client({
-    region: env.AWS_REGION,
+    region: config.AWS_REGION,
     credentials: {
-      accessKeyId: env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
+      accessKeyId: config.AWS_ACCESS_KEY_ID,
+      secretAccessKey: config.AWS_SECRET_ACCESS_KEY,
     },
   });
 }
 
-function getPublicUrl(key, env) {
-  const prefix = env.S3_PUBLIC_URL_PREFIX;
+function getPublicUrl(key, config) {
+  const prefix = config.S3_PUBLIC_URL_PREFIX;
   if (prefix) {
     return `${prefix.replace(/\/$/, "")}/${key}`;
   }
 
-  const region = env.AWS_REGION;
-  const bucket = env.S3_BUCKET_NAME;
+  const region = config.AWS_REGION;
+  const bucket = config.S3_BUCKET_NAME;
 
   if (region === "us-east-1") {
     return `https://${bucket}.s3.amazonaws.com/${key}`;
@@ -51,24 +51,24 @@ function mimeToExtension(mimetype) {
   return map[mimetype] || "";
 }
 
-function validateEnv(env) {
+function validateConfig(config) {
   const required = [
     "AWS_ACCESS_KEY_ID",
     "AWS_SECRET_ACCESS_KEY",
     "AWS_REGION",
     "S3_BUCKET_NAME",
   ];
-  const missing = required.filter((key) => !env[key]);
+  const missing = required.filter((key) => !config[key]);
   if (missing.length > 0) {
     throw new Error(`Missing configuration: ${missing.join(", ")}`);
   }
 }
 
-async function uploadImage(file, env) {
-  validateEnv(env);
+async function uploadImage(file, config) {
+  validateConfig(config);
 
-  const s3Client = getS3Client(env);
-  const bucket = env.S3_BUCKET_NAME;
+  const s3Client = getS3Client(config);
+  const bucket = config.S3_BUCKET_NAME;
   const key = buildObjectKey(file.originalname, file.mimetype);
 
   await s3Client.send(
@@ -83,7 +83,7 @@ async function uploadImage(file, env) {
 
   return {
     key,
-    url: getPublicUrl(key, env),
+    url: getPublicUrl(key, config),
     contentType: file.mimetype,
     size: file.size,
   };
