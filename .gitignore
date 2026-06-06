@@ -2,6 +2,7 @@ node_modules/
 dist/
 .env
 .dev.vars
+.deploy-secrets.env
 .wrangler/
 *.log
 .DS_Store

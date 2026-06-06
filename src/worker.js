@@ -47,7 +47,7 @@ export default {
 
       if (!configured.AWS_ACCESS_KEY_ID || !configured.AWS_SECRET_ACCESS_KEY) {
         response.hint =
-          "Add AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY as Secrets (encrypted), not plain Variables. Plain Variables are removed on each wrangler deploy.";
+          "Add AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY under Cloudflare → Settings → Build → Build variables and secrets, then set deploy command to: npm run deploy";
       }
 
       return jsonResponse(response);

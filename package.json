@@ -8,7 +8,7 @@
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
     "dev:worker": "wrangler dev",
-    "deploy": "wrangler deploy"
+    "deploy": "node scripts/deploy.mjs"
   },
   "engines": {
     "node": ">=18"
