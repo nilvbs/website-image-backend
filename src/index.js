@@ -1,9 +1,9 @@
-require("dotenv").config();
+import "dotenv/config";
 
-const express = require("express");
-const cors = require("cors");
-const multer = require("multer");
-const uploadRouter = require("./routes/upload");
+import express from "express";
+import cors from "cors";
+import multer from "multer";
+import uploadRouter from "./routes/upload.js";
 
 const requiredEnv = [
   "AWS_ACCESS_KEY_ID",

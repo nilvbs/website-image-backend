@@ -1,0 +1,8 @@
+name = "website-image-backend"
+main = "src/worker.js"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+AWS_REGION = "us-east-2"
+S3_BUCKET_NAME = "vbs-website-image"

@@ -1,23 +1,30 @@
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
-const { v4: uuidv4 } = require("uuid");
-const path = require("path");
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { v4 as uuidv4 } from "uuid";
 
-const s3Client = new S3Client({
-  region: process.env.AWS_REGION,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  },
-});
+function getExtension(filename) {
+  const lastDot = filename.lastIndexOf(".");
+  if (lastDot === -1) return "";
+  return filename.slice(lastDot).toLowerCase();
+}
 
-function getPublicUrl(key) {
-  const prefix = process.env.S3_PUBLIC_URL_PREFIX;
+function getS3Client(env) {
+  return new S3Client({
+    region: env.AWS_REGION,
+    credentials: {
+      accessKeyId: env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
+    },
+  });
+}
+
+function getPublicUrl(key, env) {
+  const prefix = env.S3_PUBLIC_URL_PREFIX;
   if (prefix) {
     return `${prefix.replace(/\/$/, "")}/${key}`;
   }
 
-  const region = process.env.AWS_REGION;
-  const bucket = process.env.S3_BUCKET_NAME;
+  const region = env.AWS_REGION;
+  const bucket = env.S3_BUCKET_NAME;
 
   if (region === "us-east-1") {
     return `https://${bucket}.s3.amazonaws.com/${key}`;
@@ -27,7 +34,7 @@ function getPublicUrl(key) {
 }
 
 function buildObjectKey(originalName, mimetype) {
-  const ext = path.extname(originalName).toLowerCase();
+  const ext = getExtension(originalName);
   const safeExt = ext || mimeToExtension(mimetype);
   return `website-image/${uuidv4()}${safeExt}`;
 }
@@ -44,8 +51,9 @@ function mimeToExtension(mimetype) {
   return map[mimetype] || "";
 }
 
-async function uploadImage(file) {
-  const bucket = process.env.S3_BUCKET_NAME;
+async function uploadImage(file, env) {
+  const s3Client = getS3Client(env);
+  const bucket = env.S3_BUCKET_NAME;
   const key = buildObjectKey(file.originalname, file.mimetype);
 
   await s3Client.send(
@@ -60,10 +68,10 @@ async function uploadImage(file) {
 
   return {
     key,
-    url: getPublicUrl(key),
+    url: getPublicUrl(key, env),
     contentType: file.mimetype,
     size: file.size,
   };
 }
 
-module.exports = { uploadImage, getPublicUrl };
+export { uploadImage, getPublicUrl };

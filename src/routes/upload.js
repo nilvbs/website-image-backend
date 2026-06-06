@@ -1,6 +1,6 @@
-const express = require("express");
-const { upload } = require("../middleware/upload");
-const { uploadImage } = require("../services/s3");
+import express from "express";
+import { upload } from "../middleware/upload.js";
+import { uploadImage } from "../services/s3.js";
 
 const router = express.Router();
 
@@ -10,7 +10,7 @@ router.post("/", upload.single("image"), async (req, res) => {
       return res.status(400).json({ error: "No image file provided. Use field name 'image'." });
     }
 
-    const result = await uploadImage(req.file);
+    const result = await uploadImage(req.file, process.env);
 
     return res.status(201).json({
       url: result.url,
@@ -24,4 +24,4 @@ router.post("/", upload.single("image"), async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

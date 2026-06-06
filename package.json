@@ -2,10 +2,13 @@
   "name": "website-image-backend",
   "version": "1.0.0",
   "description": "Backend service to upload images to S3 and return preview URLs",
-  "main": "src/index.js",
+  "type": "module",
+  "main": "src/worker.js",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "node --watch src/index.js"
+    "dev": "node --watch src/index.js",
+    "dev:worker": "wrangler dev",
+    "deploy": "wrangler deploy"
   },
   "engines": {
     "node": ">=18"
@@ -17,5 +20,8 @@
     "express": "^4.21.2",
     "multer": "^1.4.5-lts.1",
     "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.98.0"
   }
 }

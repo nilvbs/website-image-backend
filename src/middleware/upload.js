@@ -1,4 +1,4 @@
-const multer = require("multer");
+import multer from "multer";
 
 const ALLOWED_MIME_TYPES = new Set([
   "image/jpeg",
@@ -9,7 +9,7 @@ const ALLOWED_MIME_TYPES = new Set([
   "image/avif",
 ]);
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -23,4 +23,4 @@ const upload = multer({
   },
 });
 
-module.exports = { upload };
+export { upload };
