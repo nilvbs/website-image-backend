@@ -2,8 +2,9 @@ name = "website-image-backend"
 main = "src/worker.js"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
+keep_vars = true
 
-# Non-sensitive config only — never put AWS credentials here.
+# Only non-sensitive values here. AWS credentials must be Cloudflare Build secrets.
 [vars]
 AWS_REGION = "us-east-2"
 S3_BUCKET_NAME = "vbs-website-image"

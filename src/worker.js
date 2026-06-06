@@ -1,4 +1,5 @@
 import { uploadImage } from "./services/s3.js";
+import { getConfigStatus, resolveConfig } from "./config.js";
 
 const ALLOWED_MIME_TYPES = new Set([
   "image/jpeg",
@@ -30,27 +31,17 @@ function jsonResponse(body, status = 200) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    const config = resolveConfig(env);
 
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: CORS_HEADERS });
     }
 
     if (url.pathname === "/health" && request.method === "GET") {
-      const configured = {
-        AWS_REGION: Boolean(env.AWS_REGION),
-        S3_BUCKET_NAME: Boolean(env.S3_BUCKET_NAME),
-        AWS_ACCESS_KEY_ID: Boolean(env.AWS_ACCESS_KEY_ID),
-        AWS_SECRET_ACCESS_KEY: Boolean(env.AWS_SECRET_ACCESS_KEY),
-      };
-
-      const response = { status: "ok", configured };
-
-      if (!configured.AWS_ACCESS_KEY_ID || !configured.AWS_SECRET_ACCESS_KEY) {
-        response.hint =
-          "Set deploy command to: npm run deploy. Add AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY under Settings → Build → Build variables and secrets.";
-      }
-
-      return jsonResponse(response);
+      return jsonResponse({
+        status: "ok",
+        configured: getConfigStatus(config),
+      });
     }
 
     if (url.pathname === "/api/upload" && request.method === "POST") {
@@ -84,7 +75,7 @@ export default {
             mimetype: file.type,
             size: file.size,
           },
-          env
+          config
         );
 
         return jsonResponse(
@@ -104,10 +95,7 @@ export default {
         }
 
         if (err.name === "CredentialsProviderError" || err.message?.includes("credential")) {
-          return jsonResponse(
-            { error: "AWS credentials are invalid or not configured in Cloudflare secrets." },
-            500
-          );
+          return jsonResponse({ error: "AWS credentials are invalid or missing." }, 500);
         }
 
         if (err.name === "AccessDenied" || err.Code === "AccessDenied") {
