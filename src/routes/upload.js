@@ -1,4 +1,5 @@
 import express from "express";
+import { resolveNodeConfig } from "../config.js";
 import { upload } from "../middleware/upload.js";
 import { uploadImage } from "../services/s3.js";
 
@@ -10,7 +11,7 @@ router.post("/", upload.single("image"), async (req, res) => {
       return res.status(400).json({ error: "No image file provided. Use field name 'image'." });
     }
 
-    const result = await uploadImage(req.file, process.env);
+    const result = await uploadImage(req.file, resolveNodeConfig());
     return res.status(201).json({
       url: result.url,
       key: result.key,

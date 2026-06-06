@@ -1,5 +1,9 @@
 import { uploadImage } from "./services/s3.js";
-import { getConfigStatus, resolveConfig } from "./config.js";
+import {
+  getConfigStatus,
+  getMissingKeys,
+  resolveWorkerConfig,
+} from "./config.js";
 
 const ALLOWED_MIME_TYPES = new Set([
   "image/jpeg",
@@ -28,21 +32,27 @@ function jsonResponse(body, status = 200) {
   });
 }
 
-
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    const config = resolveConfig(env);
+    const config = resolveWorkerConfig(env);
 
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: CORS_HEADERS });
     }
 
     if (url.pathname === "/health" && request.method === "GET") {
-      return jsonResponse({
-        status: "ok",
-        configured: getConfigStatus(config),
-      });
+      const configured = getConfigStatus(config);
+      const response = { status: "ok", configured, bindings: Object.keys(env) };
+
+      const missing = getMissingKeys(config);
+      if (missing.length > 0) {
+        response.hint =
+          `Missing env bindings: ${missing.join(", ")}. ` +
+          "Set them as Worker Secrets (not Variables) via Dashboard or: npx wrangler secret put <NAME>";
+      }
+
+      return jsonResponse(response);
     }
 
     if (url.pathname === "/api/upload" && request.method === "POST") {

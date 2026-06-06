@@ -4,7 +4,8 @@ compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 keep_vars = true
 
-# Only non-sensitive values here. AWS credentials must be Cloudflare Build secrets.
+# Only non-sensitive values. Never put AWS_ACCESS_KEY_ID or AWS_SECRET_ACCESS_KEY here.
+# Set those as Worker Secrets via Dashboard or: npx wrangler secret put <NAME>
 [vars]
 AWS_REGION = "us-east-2"
 S3_BUCKET_NAME = "vbs-website-image"
