@@ -8,6 +8,7 @@
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
     "dev:worker": "wrangler dev",
+    "setup:secrets": "node scripts/set-secrets.mjs",
     "deploy": "node scripts/deploy.mjs"
   },
   "engines": {
