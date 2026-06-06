@@ -7,6 +7,3 @@ compatibility_flags = ["nodejs_compat"]
 [vars]
 AWS_REGION = "us-east-2"
 S3_BUCKET_NAME = "vbs-website-image"
-
-[secrets]
-required = ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
