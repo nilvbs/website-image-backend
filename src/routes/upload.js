@@ -11,7 +11,6 @@ router.post("/", upload.single("image"), async (req, res) => {
     }
 
     const result = await uploadImage(req.file, process.env);
-
     return res.status(201).json({
       url: result.url,
       key: result.key,
